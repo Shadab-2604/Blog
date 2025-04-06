@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic"
+
 import { getBlogPostBySlug } from "@/lib/api"
 import { formatDate } from "@/lib/utils"
 import { notFound } from "next/navigation"

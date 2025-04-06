@@ -1,35 +1,12 @@
-"use client"
+export const dynamic = "force-dynamic"
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { BlogEditor } from "@/components/blog-editor"
-import { checkAuth } from "@/lib/api"
+import { NewPostForm } from "@/components/new-post-form"
 
-export default function NewPost() {
-  const [loading, setLoading] = useState(true)
-  const router = useRouter()
-
-  useEffect(() => {
-    const checkAuthentication = async () => {
-      const isAuthenticated = await checkAuth()
-      if (!isAuthenticated) {
-        router.push("/admin/login")
-      } else {
-        setLoading(false)
-      }
-    }
-
-    checkAuthentication()
-  }, [router])
-
-  if (loading) {
-    return <div className="container mx-auto px-4 py-8">Loading...</div>
-  }
-
+export default function NewPostPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Create New Post</h1>
-      <BlogEditor />
+      <NewPostForm />
     </div>
   )
 }

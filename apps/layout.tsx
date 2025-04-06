@@ -1,32 +1,20 @@
-import type React from "react"
-import type { Metadata } from "next"
-import { Inter } from "next/font/google"
-import "./globals.css"
-import { Navbar } from "@/components/navbar"
-import { Footer } from "@/component/footer"
-
-const inter = Inter({ subsets: ["latin"] })
+import type { Metadata } from 'next'
+import './globals.css'
 
 export const metadata: Metadata = {
-  title: "Blog Platform",
-  description: "A full-stack blog platform built with Next.js and Express",
+  title: 'v0 App',
+  description: 'Created with v0',
+  generator: 'v0.dev',
 }
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode
-}) {
+}>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <div className="flex flex-col min-h-screen">
-          <Navbar />
-          <div className="flex-grow">{children}</div>
-          <Footer />
-        </div>
-      </body>
+      <body>{children}</body>
     </html>
   )
 }
-

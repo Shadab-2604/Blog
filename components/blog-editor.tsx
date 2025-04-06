@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+
 import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import dynamic from "next/dynamic"
@@ -14,7 +15,9 @@ import { createBlogPost, updateBlogPost, uploadImage } from "@/lib/api"
 import type { BlogPost } from "@/types"
 import Image from "next/image"
 
-const TiptapEditor = dynamic(() => import("./tiptap-editor"), { ssr: false });
+// Dynamically import ReactQuill to avoid SSR issues
+const ReactQuill = dynamic(() => import("react-quill"), { ssr: false })
+import "react-quill/dist/quill.snow.css"
 
 interface BlogEditorProps {
   post?: BlogPost
@@ -32,6 +35,7 @@ export function BlogEditor({ post }: BlogEditorProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
 
+  // Generate slug from title
   useEffect(() => {
     if (!post && title && !slug) {
       setSlug(
@@ -42,6 +46,22 @@ export function BlogEditor({ post }: BlogEditorProps) {
       )
     }
   }, [title, slug, post])
+
+  const modules = {
+    toolbar: [
+      [{ header: [1, 2, 3, 4, 5, 6, false] }],
+      ["bold", "italic", "underline", "strike"],
+      [{ list: "ordered" }, { list: "bullet" }],
+      [{ indent: "-1" }, { indent: "+1" }],
+      ["link", "image"],
+      ["clean"],
+    ],
+    clipboard: {
+      matchVisual: false,
+    },
+  }
+
+  const formats = ["header", "bold", "italic", "underline", "strike", "list", "bullet", "indent", "link", "image"]
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -55,7 +75,6 @@ export function BlogEditor({ post }: BlogEditorProps) {
       setCoverImage(imageUrl)
     } catch (err) {
       setError("Failed to upload image. Please try again.")
-      console.error("Image upload error:", err)
     } finally {
       setIsUploading(false)
     }
@@ -93,9 +112,8 @@ export function BlogEditor({ post }: BlogEditorProps) {
       }
 
       router.push("/admin/dashboard")
-    } catch (err: any) {
-      console.error("Save post error:", err)
-      setError(err?.response?.data?.message || "Failed to save post. Please try again.")
+    } catch (err) {
+      setError("Failed to save post. Please try again.")
     } finally {
       setIsSaving(false)
     }
@@ -172,8 +190,14 @@ export function BlogEditor({ post }: BlogEditorProps) {
 
       <div className="space-y-2">
         <Label htmlFor="content">Content</Label>
-        <Card className="p-2">
-          <TiptapEditor content={content} onChange={setContent} />
+        <Card className="p-0 overflow-hidden">
+          <ReactQuill
+            value={content}
+            onChange={setContent}
+            modules={modules}
+            formats={formats}
+            className="min-h-[300px]"
+          />
         </Card>
       </div>
 
@@ -204,3 +228,4 @@ export function BlogEditor({ post }: BlogEditorProps) {
     </div>
   )
 }
+
