@@ -1,41 +1,51 @@
 "use client"
 
-import type React from "react"
-
 import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import dynamic from "next/dynamic"
+import { EditorContent, useEditor } from "@tiptap/react"
+import StarterKit from "@tiptap/starter-kit"
+import Link from "@tiptap/extension-link"
+import ImageExtension from "@tiptap/extension-image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Card } from "@/components/ui/card"
 import { Loader2, Save, Eye, Upload, X } from "lucide-react"
+import Image from "next/image"
 import { createBlogPost, updateBlogPost, uploadImage } from "@/lib/api"
 import type { BlogPost } from "@/types"
-import Image from "next/image"
-
-// Dynamically import ReactQuill to avoid SSR issues
-const ReactQuill = dynamic(() => import("react-quill"), { ssr: false })
-import "react-quill/dist/quill.snow.css"
 
 interface BlogEditorProps {
   post?: BlogPost
 }
 
 export function BlogEditor({ post }: BlogEditorProps) {
-  const [title, setTitle] = useState(post?.title || "")
-  const [content, setContent] = useState(post?.content || "")
-  const [slug, setSlug] = useState(post?.slug || "")
-  const [published, setPublished] = useState(post?.published || false)
-  const [coverImage, setCoverImage] = useState(post?.coverImage || "")
+  const router = useRouter()
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // SessionStorage keys
+  const sessionKey = "blog-editor"
+
+  // Load session values
+  const sessionData = typeof window !== "undefined" ? JSON.parse(sessionStorage.getItem(sessionKey) || "{}") : {}
+
+  const [title, setTitle] = useState(post?.title || sessionData.title || "")
+  const [slug, setSlug] = useState(post?.slug || sessionData.slug || "")
+  const [published, setPublished] = useState(post?.published || sessionData.published || false)
+  const [coverImage, setCoverImage] = useState(post?.coverImage || sessionData.coverImage || "")
   const [isUploading, setIsUploading] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState("")
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const router = useRouter()
 
-  // Generate slug from title
+  const editor = useEditor({
+    extensions: [StarterKit, Link, ImageExtension],
+    content: post?.content || sessionData.content || "",
+    onUpdate: ({ editor }) => {
+      updateSession("content", editor.getHTML())
+    },
+  })
+
   useEffect(() => {
     if (!post && title && !slug) {
       setSlug(
@@ -47,21 +57,14 @@ export function BlogEditor({ post }: BlogEditorProps) {
     }
   }, [title, slug, post])
 
-  const modules = {
-    toolbar: [
-      [{ header: [1, 2, 3, 4, 5, 6, false] }],
-      ["bold", "italic", "underline", "strike"],
-      [{ list: "ordered" }, { list: "bullet" }],
-      [{ indent: "-1" }, { indent: "+1" }],
-      ["link", "image"],
-      ["clean"],
-    ],
-    clipboard: {
-      matchVisual: false,
-    },
+  const updateSession = (key: string, value: any) => {
+    const current = JSON.parse(sessionStorage.getItem(sessionKey) || "{}")
+    sessionStorage.setItem(sessionKey, JSON.stringify({ ...current, [key]: value }))
   }
 
-  const formats = ["header", "bold", "italic", "underline", "strike", "list", "bullet", "indent", "link", "image"]
+  const clearSession = () => {
+    sessionStorage.removeItem(sessionKey)
+  }
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -73,6 +76,7 @@ export function BlogEditor({ post }: BlogEditorProps) {
     try {
       const imageUrl = await uploadImage(file)
       setCoverImage(imageUrl)
+      updateSession("coverImage", imageUrl)
     } catch (err) {
       setError("Failed to upload image. Please try again.")
     } finally {
@@ -82,13 +86,12 @@ export function BlogEditor({ post }: BlogEditorProps) {
 
   const handleRemoveCoverImage = () => {
     setCoverImage("")
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ""
-    }
+    updateSession("coverImage", "")
+    if (fileInputRef.current) fileInputRef.current.value = ""
   }
 
   const handleSave = async (isPublished = published) => {
-    if (!title || !content) {
+    if (!title || !editor?.getHTML()) {
       setError("Title and content are required")
       return
     }
@@ -99,9 +102,9 @@ export function BlogEditor({ post }: BlogEditorProps) {
     try {
       const postData = {
         title,
-        content,
         slug,
         published: isPublished,
+        content: editor.getHTML(),
         coverImage,
       }
 
@@ -111,6 +114,7 @@ export function BlogEditor({ post }: BlogEditorProps) {
         await createBlogPost(postData)
       }
 
+      clearSession()
       router.push("/admin/dashboard")
     } catch (err) {
       setError("Failed to save post. Please try again.")
@@ -122,11 +126,15 @@ export function BlogEditor({ post }: BlogEditorProps) {
   const handlePreview = () => {
     const postData = {
       title,
-      content,
+      content: editor?.getHTML(),
       slug,
       published,
       coverImage,
     }
+
+    updateSession("title", title)
+    updateSession("slug", slug)
+    updateSession("published", published)
 
     const encodedData = encodeURIComponent(JSON.stringify(postData))
     router.push(`/admin/posts/preview?data=${encodedData}`)
@@ -141,15 +149,23 @@ export function BlogEditor({ post }: BlogEditorProps) {
         <Input
           id="title"
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Enter post title"
-          className="text-lg"
+          onChange={(e) => {
+            setTitle(e.target.value)
+            updateSession("title", e.target.value)
+          }}
         />
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="slug">Slug</Label>
-        <Input id="slug" value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="post-url-slug" />
+        <Input
+          id="slug"
+          value={slug}
+          onChange={(e) => {
+            setSlug(e.target.value)
+            updateSession("slug", e.target.value)
+          }}
+        />
       </div>
 
       <div className="space-y-2">
@@ -157,15 +173,26 @@ export function BlogEditor({ post }: BlogEditorProps) {
         {coverImage ? (
           <div className="relative">
             <div className="relative w-full h-48 rounded-md overflow-hidden">
-              <Image src={coverImage || "/placeholder.svg"} alt="Cover" fill className="object-cover" />
+              <Image src={coverImage} alt="Cover" fill className="object-cover" />
             </div>
-            <Button variant="destructive" size="sm" className="absolute top-2 right-2" onClick={handleRemoveCoverImage}>
+            <Button
+              variant="destructive"
+              size="sm"
+              className="absolute top-2 right-2"
+              onClick={handleRemoveCoverImage}
+            >
               <X className="h-4 w-4" />
             </Button>
           </div>
         ) : (
           <div className="border-2 border-dashed border-gray-300 rounded-md p-6 text-center">
-            <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" ref={fileInputRef} />
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="hidden"
+              ref={fileInputRef}
+            />
             <Button
               type="button"
               variant="outline"
@@ -190,19 +217,25 @@ export function BlogEditor({ post }: BlogEditorProps) {
 
       <div className="space-y-2">
         <Label htmlFor="content">Content</Label>
-        <Card className="p-0 overflow-hidden">
-          <ReactQuill
-            value={content}
-            onChange={setContent}
-            modules={modules}
-            formats={formats}
-            className="min-h-[300px]"
-          />
+        <Card className="p-4">
+          {editor && (
+            <EditorContent
+              editor={editor}
+              className="prose min-h-[300px]"
+            />
+          )}
         </Card>
       </div>
 
       <div className="flex items-center space-x-2">
-        <Switch id="published" checked={published} onCheckedChange={setPublished} />
+        <Switch
+          id="published"
+          checked={published}
+          onCheckedChange={(val) => {
+            setPublished(val)
+            updateSession("published", val)
+          }}
+        />
         <Label htmlFor="published">Publish post</Label>
       </div>
 
@@ -228,4 +261,3 @@ export function BlogEditor({ post }: BlogEditorProps) {
     </div>
   )
 }
-

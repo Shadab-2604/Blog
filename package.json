@@ -38,6 +38,8 @@
     "@radix-ui/react-toggle-group": "^1.1.1",
     "@radix-ui/react-tooltip": "^1.1.6",
     "@tailwindcss/typography": "latest",
+    "@tiptap/extension-image": "^2.11.7",
+    "@tiptap/extension-link": "^2.11.7",
     "@tiptap/react": "^2.11.7",
     "@tiptap/starter-kit": "^2.11.7",
     "autoprefixer": "^10.4.20",
