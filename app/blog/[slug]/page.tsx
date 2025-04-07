@@ -28,12 +28,14 @@ export default async function BlogPost({ params }: { params: { slug: string } })
       </div>
 
       {post.coverImage && (
-        <div className="relative w-full h-[400px] mb-8 rounded-lg overflow-hidden shadow-md">
+        <div className="mb-8 w-full">
           <Image
-            src={post.coverImage || "/placeholder.svg"}
+            src={post.coverImage}
             alt={post.title}
-            fill
-            className="object-cover"
+            width={1200} // adjust for better resolution
+            height={0}   // this makes height auto
+            sizes="100vw"
+            className="w-full h-auto rounded-lg shadow-md"
             priority
           />
         </div>
