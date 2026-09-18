@@ -31,9 +31,13 @@ export function LoginForm() {
     setLoading(true)
 
     try {
-      const success = await login(identifier.trim(), password)
-      if (success) {
-        router.push("/admin/dashboard")
+      const loggedInUser = await login(identifier.trim(), password)
+      if (loggedInUser) {
+        if (loggedInUser.role === "admin") {
+          router.push("/admin/dashboard")
+        } else {
+          router.push("/")
+        }
       } else {
         setError("Invalid credentials. Please verify and try again.")
       }

@@ -23,14 +23,14 @@ interface AuthContextType {
   authModalTab: "login" | "register"
   openAuthModal: (tab?: "login" | "register") => void
   closeAuthModal: () => void
-  login: (usernameOrEmail: string, pass: string) => Promise<boolean>
+  login: (usernameOrEmail: string, pass: string) => Promise<User | null>
   register: (data: {
     name: string
     email: string
     username: string
     password: string
     avatar?: string
-  }) => Promise<boolean>
+  }) => Promise<User | null>
   logout: () => Promise<void>
   savedPostIds: Set<string>
   isSaved: (postId: string) => boolean
@@ -138,7 +138,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsAuthModalOpen(false)
   }
 
-  const login = async (usernameOrEmail: string, pass: string): Promise<boolean> => {
+  const login = async (usernameOrEmail: string, pass: string): Promise<User | null> => {
     try {
       const data = await apiLogin(usernameOrEmail, pass)
       if (data && data.user) {
@@ -146,13 +146,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setSavedPostIds(new Set(data.user.savedPosts || []))
         closeAuthModal()
         toast.success(`Welcome back, ${data.user.name || data.user.username}!`)
-        return true
+        return data.user
       }
-      return false
+      return null
     } catch (err: any) {
       const msg = err.response?.data?.message || "Invalid credentials"
       toast.error(msg)
-      return false
+      return null
     }
   }
 
@@ -162,7 +162,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     username: string
     password: string
     avatar?: string
-  }): Promise<boolean> => {
+  }): Promise<User | null> => {
     try {
       const res = await apiRegister(data)
       if (res && res.user) {
@@ -170,13 +170,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setSavedPostIds(new Set(res.user.savedPosts || []))
         closeAuthModal()
         toast.success(`Account created! Welcome, ${res.user.name || res.user.username}!`)
-        return true
+        return res.user
       }
-      return false
+      return null
     } catch (err: any) {
       const msg = err.response?.data?.message || "Registration failed"
       toast.error(msg)
-      return false
+      return null
     }
   }
 
