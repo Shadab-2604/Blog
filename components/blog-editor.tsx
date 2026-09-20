@@ -57,7 +57,7 @@ export function BlogEditor({ post }: BlogEditorProps) {
 
   const [title, setTitle] = useState("")
   const [slug, setSlug] = useState("")
-  const [published, setPublished] = useState(false)
+  const [published, setPublished] = useState(post ? (typeof post.published === "boolean" ? post.published : true) : true)
   const [coverImage, setCoverImage] = useState("")
   const [isUploading, setIsUploading] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
@@ -145,7 +145,7 @@ export function BlogEditor({ post }: BlogEditorProps) {
         if (sessionData) {
           setTitle(sessionData.title || "")
           setSlug(sessionData.slug || "")
-          setPublished(sessionData.published || false)
+          setPublished(typeof sessionData?.published === "boolean" ? sessionData.published : true)
           setCoverImage(sessionData.coverImage || "")
           if (editor && !editor.isDestroyed && sessionData.content) {
             editor.commands.setContent(sessionData.content)
@@ -272,9 +272,15 @@ export function BlogEditor({ post }: BlogEditorProps) {
     setError("")
 
     try {
+      const formattedSlug = (slug.trim() || title)
+        .toLowerCase()
+        .replace(/[^\w\s-]/g, "")
+        .replace(/[\s_-]+/g, "-")
+        .replace(/^-+|-+$/g, "")
+
       const postData = {
         title: title.trim(),
-        slug: slug.trim() || title.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-"),
+        slug: formattedSlug,
         published: isPublished,
         content: contentHtml,
         coverImage,

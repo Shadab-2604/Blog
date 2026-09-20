@@ -10,12 +10,21 @@ function getSocketUrl(): string {
       return "http://localhost:5000"
     }
   }
-  return (
+  const envUrl =
     process.env.NEXT_PUBLIC_SOCKET_URL ||
     (process.env.NEXT_PUBLIC_API_URL
       ? process.env.NEXT_PUBLIC_API_URL.replace(/\/api\/?$/, "")
-      : "http://localhost:5000")
-  )
+      : "")
+
+  if (envUrl && !envUrl.includes("localhost")) {
+    return envUrl
+  }
+
+  if (typeof window !== "undefined" && !window.location.hostname.includes("localhost")) {
+    return "https://blog-backend-zeta-five.vercel.app"
+  }
+
+  return envUrl || "http://localhost:5000"
 }
 
 let socketInstance: Socket | null = null
@@ -25,15 +34,15 @@ export function getSocket(): Socket {
     socketInstance = io(getSocketUrl(), {
       withCredentials: true,
       autoConnect: true,
-      transports: ["websocket", "polling"],
-      reconnectionAttempts: 5,
+      transports: ["polling", "websocket"],
+      reconnectionAttempts: 3,
       reconnectionDelay: 2000,
       timeout: 8000,
     })
 
     // Gracefully handle connection errors without throwing uncaught exceptions to the console
-    socketInstance.on("connect_error", () => {
-      // Degrades gracefully to HTTP REST polling if WebSockets are unavailable
+    socketInstance.on("connect_error", (err) => {
+      // Suppress noisy WebSocket/Serverless connection error logs in production
     })
   }
   return socketInstance

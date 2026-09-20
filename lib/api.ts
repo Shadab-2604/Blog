@@ -11,12 +11,23 @@ function getBaseUrl(): string {
       return "http://localhost:5000/api"
     }
   }
-  let url = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"
-  url = url.trim().replace(/\/+$/, "")
-  if (!url.endsWith("/api")) {
-    url = `${url}/api`
+
+  let envUrl = process.env.NEXT_PUBLIC_API_URL || ""
+  envUrl = envUrl.trim().replace(/\/+$/, "")
+
+  if (envUrl && !envUrl.includes("localhost")) {
+    if (!envUrl.endsWith("/api")) {
+      envUrl = `${envUrl}/api`
+    }
+    return envUrl
   }
-  return url
+
+  // Production fallback if environment variables are not configured in Vercel UI
+  if (typeof window !== "undefined" && !window.location.hostname.includes("localhost")) {
+    return "https://blog-backend-zeta-five.vercel.app/api"
+  }
+
+  return "http://localhost:5000/api"
 }
 
 // Create axios instance
@@ -50,7 +61,8 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
 
 export async function getBlogPostById(id: string): Promise<BlogPost | null> {
   try {
-    const response = await api.get(`/posts/${id}`)
+    const cleanId = decodeURIComponent(id)
+    const response = await api.get(`/posts/${encodeURIComponent(cleanId)}`)
     return response.data
   } catch (error) {
     return null
@@ -59,7 +71,8 @@ export async function getBlogPostById(id: string): Promise<BlogPost | null> {
 
 export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> {
   try {
-    const response = await api.get(`/posts/slug/${slug}`)
+    const cleanSlug = decodeURIComponent(slug)
+    const response = await api.get(`/posts/slug/${encodeURIComponent(cleanSlug)}`)
     return response.data
   } catch (error) {
     return null
