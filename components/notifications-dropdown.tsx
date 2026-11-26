@@ -23,7 +23,7 @@ export function NotificationsDropdown() {
       case "like":
         return <Heart className="h-4 w-4 text-rose-500 fill-rose-500/20" />
       case "comment":
-        return <MessageSquare className="h-4 w-4 text-indigo-500 fill-indigo-500/20" />
+        return <MessageSquare className="h-4 w-4 text-foreground fill-foreground/15" />
       case "role_change":
         return <Shield className="h-4 w-4 text-amber-500" />
       default:
@@ -62,7 +62,7 @@ export function NotificationsDropdown() {
           <div className="flex items-center gap-2">
             <span className="text-sm font-semibold text-foreground">Notifications</span>
             {unreadCount > 0 && (
-              <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-500 font-medium">
+              <span className="text-xs px-2 py-0.5 rounded-full bg-secondary text-foreground font-medium">
                 {unreadCount} new
               </span>
             )}
@@ -70,7 +70,7 @@ export function NotificationsDropdown() {
           {unreadCount > 0 && (
             <button
               onClick={markAllAsRead}
-              className="text-xs text-muted-foreground hover:text-indigo-500 flex items-center gap-1 transition-colors"
+              className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
             >
               <CheckCheck className="h-3.5 w-3.5" />
               Mark all read
@@ -88,7 +88,7 @@ export function NotificationsDropdown() {
               const content = (
                 <div
                   className={`p-3.5 flex items-start gap-3 transition-colors cursor-pointer hover:bg-muted/50 ${
-                    !notif.read ? "bg-indigo-500/[0.04]" : ""
+                    !notif.read ? "bg-secondary/60" : ""
                   }`}
                   onClick={() => !notif.read && markAsRead(notif._id)}
                 >
@@ -101,7 +101,7 @@ export function NotificationsDropdown() {
                         {notif.title}
                       </p>
                       {!notif.read && (
-                        <span className="h-2 w-2 rounded-full bg-indigo-600 shrink-0" />
+                        <span className="h-2 w-2 rounded-full bg-primary shrink-0" />
                       )}
                     </div>
                     <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">

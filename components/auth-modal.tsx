@@ -69,7 +69,7 @@ export function AuthModal() {
       <DialogContent className="sm:max-w-md bg-card border-border text-foreground">
         <DialogHeader>
           <div className="flex items-center gap-2 mb-1">
-            <div className="h-8 w-8 rounded-lg bg-indigo-600/10 text-indigo-500 flex items-center justify-center">
+            <div className="h-8 w-8 rounded-lg bg-secondary text-foreground flex items-center justify-center">
               <Sparkles className="h-4 w-4" />
             </div>
             <DialogTitle className="text-xl font-bold">Account Access</DialogTitle>
@@ -124,7 +124,7 @@ export function AuthModal() {
 
               <Button
                 type="submit"
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium shadow-md transition-all duration-200"
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-md transition-all duration-200"
                 disabled={isLoggingIn}
               >
                 {isLoggingIn ? (
@@ -209,8 +209,8 @@ export function AuthModal() {
                         onClick={() => setSelectedAvatar(url)}
                         className={`relative aspect-square rounded-full p-1 border-2 transition-all duration-200 overflow-hidden bg-muted/40 hover:scale-105 ${
                           isSelected
-                            ? "border-indigo-600 ring-2 ring-indigo-500/30 scale-105 bg-indigo-50/10"
-                            : "border-border hover:border-indigo-400"
+                            ? "border-foreground ring-2 ring-foreground/20 scale-105 bg-secondary"
+                            : "border-border hover:border-foreground/30"
                         }`}
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -220,7 +220,7 @@ export function AuthModal() {
                           className="w-full h-full object-cover rounded-full"
                         />
                         {isSelected && (
-                          <div className="absolute inset-0 bg-indigo-600/30 rounded-full flex items-center justify-center">
+                          <div className="absolute inset-0 bg-primary/30 rounded-full flex items-center justify-center">
                             <Check className="h-4 w-4 text-white drop-shadow-md" />
                           </div>
                         )}
@@ -232,7 +232,7 @@ export function AuthModal() {
 
               <Button
                 type="submit"
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium shadow-md transition-all duration-200"
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-md transition-all duration-200"
                 disabled={isRegistering}
               >
                 {isRegistering ? (

@@ -54,7 +54,7 @@ export function LoginForm() {
       <div className="mb-6">
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           Back to Blog Home
@@ -63,7 +63,7 @@ export function LoginForm() {
 
       <Card className="bg-card border-border shadow-lg">
         <CardHeader className="text-center pb-6">
-          <div className="w-12 h-12 rounded-2xl bg-indigo-600/10 dark:bg-indigo-400/15 border border-indigo-500/20 text-indigo-600 dark:text-indigo-400 mx-auto flex items-center justify-center mb-3 shadow-inner">
+          <div className="w-12 h-12 rounded-2xl bg-secondary border border-border text-foreground mx-auto flex items-center justify-center mb-3 shadow-inner">
             <Lock className="w-6 h-6" />
           </div>
           <CardTitle className="text-2xl font-bold text-foreground">Sign In</CardTitle>
@@ -94,7 +94,7 @@ export function LoginForm() {
                 required
                 disabled={loading}
                 autoComplete="username"
-                className="bg-background border-input focus-visible:ring-indigo-500"
+                className="bg-background border-input focus-visible:ring-ring"
               />
             </div>
 
@@ -111,7 +111,7 @@ export function LoginForm() {
                 required
                 disabled={loading}
                 autoComplete="current-password"
-                className="bg-background border-input focus-visible:ring-indigo-500"
+                className="bg-background border-input focus-visible:ring-ring"
               />
             </div>
           </CardContent>
@@ -119,7 +119,7 @@ export function LoginForm() {
           <CardFooter className="pt-2 pb-6 flex flex-col gap-3">
             <Button
               type="submit"
-              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-md transition-all"
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-md transition-all"
               disabled={loading}
             >
               {loading ? (

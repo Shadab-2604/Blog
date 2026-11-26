@@ -2,7 +2,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { formatDate } from "@/lib/utils"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { Calendar, Clock, ArrowRight, BookOpen, Eye, Heart } from "lucide-react"
+import { Calendar, Clock, ArrowUpRight, BookOpen, Eye, Heart } from "lucide-react"
 import type { BlogPost } from "@/types"
 
 interface BlogCardProps {
@@ -41,40 +41,40 @@ export function BlogCard({ post }: BlogCardProps) {
 
   return (
     <Link href={`/blog/${post.slug || post._id}`} className="group block h-full focus:outline-none">
-      <Card className="h-full flex flex-col overflow-hidden rounded-2xl border-border bg-card hover:border-indigo-500/40 dark:hover:border-indigo-400/40 hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300 transform group-hover:-translate-y-1">
-        {/* Cover Image or Elegant Pattern Fallback */}
-        <div className="relative w-full h-48 sm:h-52 overflow-hidden bg-muted/40">
+      <Card className="h-full flex flex-col overflow-hidden rounded-2xl border border-border bg-card hover:border-foreground/25 hover:shadow-md transition-all duration-200 group-hover:-translate-y-0.5">
+        {/* Cover Image or Editorial Fallback */}
+        <div className="relative w-full h-48 sm:h-52 overflow-hidden bg-secondary border-b border-border">
           {post.coverImage ? (
             <Image
               src={post.coverImage}
               alt={post.title}
               fill
-              className="object-cover group-hover:scale-105 transition-transform duration-500"
+              className="object-cover group-hover:scale-[1.03] transition-transform duration-500"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               unoptimized
             />
           ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-indigo-500/10 to-slate-500/10 dark:from-slate-900 dark:to-slate-800 p-6 text-center">
-              <div className="w-12 h-12 rounded-full bg-indigo-500/15 dark:bg-indigo-400/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 mb-2">
-                <BookOpen className="w-6 h-6" />
+            <div className="w-full h-full flex flex-col items-center justify-center bg-dot-grid p-6 text-center">
+              <div className="w-11 h-11 rounded-xl border border-border bg-background flex items-center justify-center text-foreground mb-2.5 shadow-sm">
+                <BookOpen className="w-5 h-5" />
               </div>
-              <span className="text-xs font-semibold tracking-wider text-indigo-600 dark:text-indigo-400 uppercase">
+              <span className="font-mono text-[11px] font-medium tracking-widest text-muted-foreground uppercase">
                 SHADAB.DEV
               </span>
             </div>
           )}
 
           {/* Reading Time Badge */}
-          <div className="absolute bottom-3 right-3 px-2.5 py-1 rounded-full text-[11px] font-medium bg-background/90 backdrop-blur-md text-foreground border border-border/80 shadow-xs flex items-center gap-1">
-            <Clock className="w-3 h-3 text-indigo-600 dark:text-indigo-400" />
-            <span>{readingTime} min read</span>
+          <div className="absolute bottom-3 right-3 px-2.5 py-1 rounded-md font-mono text-[11px] font-medium bg-background/90 backdrop-blur-md text-foreground border border-border flex items-center gap-1.5">
+            <Clock className="w-3 h-3 text-muted-foreground" />
+            <span>{readingTime} min</span>
           </div>
         </div>
 
         {/* Content Section */}
         <CardContent className="flex-1 p-6 flex flex-col justify-between">
           <div>
-            <h2 className="text-xl font-bold tracking-tight text-foreground group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-2 mb-3 leading-snug">
+            <h2 className="text-lg font-semibold tracking-tight text-foreground group-hover:text-foreground/80 transition-colors line-clamp-2 mb-2.5 leading-snug">
               {post.title}
             </h2>
             <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
@@ -84,28 +84,28 @@ export function BlogCard({ post }: BlogCardProps) {
         </CardContent>
 
         {/* Card Footer with Meta & CTA */}
-        <CardFooter className="px-6 pb-6 pt-0 border-t border-border/40 mt-auto flex items-center justify-between text-xs text-muted-foreground">
+        <CardFooter className="px-6 py-4 border-t border-border mt-auto flex items-center justify-between text-xs text-muted-foreground">
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 font-mono text-[11px]">
               <Calendar className="w-3.5 h-3.5" />
               <span>{formatDate(post.createdAt)}</span>
             </div>
             {(post.views !== undefined && post.views > 0) && (
-              <span className="flex items-center gap-1 text-[11px]">
-                <Eye className="w-3 h-3 text-sky-500" />
+              <span className="flex items-center gap-1 text-[11px] font-mono">
+                <Eye className="w-3 h-3" />
                 {post.views}
               </span>
             )}
             {(post.likes && post.likes.length > 0) && (
-              <span className="flex items-center gap-1 text-[11px]">
-                <Heart className="w-3 h-3 text-rose-500" />
+              <span className="flex items-center gap-1 text-[11px] font-mono">
+                <Heart className="w-3 h-3" />
                 {post.likes.length}
               </span>
             )}
           </div>
 
-          <span className="inline-flex items-center gap-1 font-semibold text-indigo-600 dark:text-indigo-400 group-hover:translate-x-0.5 transition-transform">
-            Read <ArrowRight className="w-3.5 h-3.5" />
+          <span className="inline-flex items-center gap-1 font-medium text-foreground group-hover:translate-x-0.5 transition-transform">
+            Read <ArrowUpRight className="w-3.5 h-3.5 text-muted-foreground" />
           </span>
         </CardFooter>
       </Card>
